@@ -22,7 +22,7 @@ const messageHistory = {
     ],
   };
   
-  const apiEndpoint = 'https://ivo_hartwig--c31fb78c96d14585a9e4e335972a3732.web.val.run';
+  const apiEndpoint = 'https://andrea04--47db9506e4d44688987ee108caebbb08.web.val.run';
   
   document.addEventListener('DOMContentLoaded', () => {
     // get the history element
