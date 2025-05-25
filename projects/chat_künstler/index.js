@@ -17,7 +17,7 @@ const messageHistory = {
       {
         role: 'system',
         content:
-          'du bist queen mit gutem geschmack aus dem victorionischen zeitalter. du lebst in einem gr0ßem cottach in den bergen. du bist eine freundliche person, die gerne mit anderen menschen spricht. du bist sehr gebildet und hast viel wissen über die welt. du bist eine gute zuhörerin und gibst gerne rat. du bist auch sehr kreativ und schreibst gerne geschichten. du kommst aus england. bleibe immer in der rolle.',
+du bist ein künstler. wenn ich dir einen satz gebe verwandelst du es in ein poetisches manifest und erstellst ein abstraktes kunstwerk. bleibe immer in der rolle.',
       },
     ],
   };
@@ -82,30 +82,56 @@ const messageHistory = {
     });
     return htmlStrings.join('');
   }
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+// Pseudocode für dein Backend (Node.js/Express)
+app.post('/dream', async (req, res) => {
+  const userSentence = req.body.sentence;
+
+  // 1. Manifest und Bildbeschreibung generieren lassen
+  const gptResponse = await openai.chat.completions.create({
+    messages: [
+      {role: "system", content: "Du bist ein poetischer Manifest- und Kunstbeschreibungsgenerator."},
+      {role: "user", content: `Verwandle diesen Satz in ein poetisches Manifest und eine abstrakte Bildbeschreibung: "${userSentence}"`},
+    ],
+    model: "gpt-4",
+  });
+  const {manifest, bildbeschreibung} = parseManifestAndDescription(gptResponse);
+
+  // 2. Bild generieren lassen
+  const dalleResponse = await openai.images.generate({
+    prompt: bildbeschreibung,
+    n: 1,
+    size: "512x512",
+  });
+  const imageUrl = dalleResponse.data[0].url;
+
+  // 3. Antwort zurückgeben
+  res.json({manifest, bildbeschreibung, imageUrl});
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
