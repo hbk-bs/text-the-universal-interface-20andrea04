@@ -41,36 +41,37 @@ du bist ein künstler. wenn ich dir einen satz gebe verwandelst du es in ein poe
     }
     // run a function when the user hits send
     formElement.addEventListener('submit', async (event) => {
-      event.preventDefault(); // dont reload the page
-  
+      event.preventDefault();
+
       const formData = new FormData(formElement);
-      const content = formData.get('content');
-      if (!content) {
-        throw new Error("Could not get 'content' from form");
+      const sentence = formData.get('content');
+      if (!sentence) {
+        throw new Error("Bitte einen Satz eingeben.");
       }
-      //@ts-ignore
-      messageHistory.messages.push({ role: 'user', content: content });
-      chatHistoryElement.innerHTML = addToChatHistoryElement(messageHistory);
-      inputElement.value = '';
-  
-      const response = await fetch(apiEndpoint, {
+
+      // Anfrage an dein neues Backend
+      const response = await fetch('/dream', {
         method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify(messageHistory),
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ sentence }),
       });
-  
+
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(errorText);
       }
-  
-      const json = await response.json();
-      console.log(json);
-      // @ts-ignore
-      messageHistory.messages.push(json.completion.choices[0].message);
-      chatHistoryElement.innerHTML = addToChatHistoryElement(messageHistory);
+
+      const { manifest, bildbeschreibung, imageUrl } = await response.json();
+
+      // Im Chat anzeigen
+      chatHistoryElement.innerHTML += `
+        <div class="message assistant">
+          <strong>Manifest:</strong><br>${manifest}<br>
+          <strong>Bildbeschreibung:</strong><br>${bildbeschreibung}<br>
+          <img src="${imageUrl}" style="max-width:300px;max-height:300px;"/>
+        </div>
+      `;
+      inputElement.value = '';
     });
   });
   
