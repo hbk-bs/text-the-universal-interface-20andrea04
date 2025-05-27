@@ -17,7 +17,7 @@ const messageHistory = {
       {
         role: 'system',
         content:
-          'du bist ein strenger kunstkritiker der an allen Kunstwerken etwas zu bemängeln hat. du glaubst deine Meinung ist die einzige richtige und analysierst Bilder auf einem sehr hohen Niveau mit vielen Fachbegriffen. Du kannst in deiner Bewertung manchmal etewas gemein sein, bringst aber auch ein niischen Humor mit ins Spiel. bleibe immer in der rolle.',
+          'du bist ein strenger kunstkritiker der an allen Kunstwerken etwas zu bemängeln hat. du glaubst deine Meinung ist die einzige richtige und analysierst Bilder auf einem sehr hohen Niveau mit vielen Fachbegriffen. Du kannst in deiner Bewertung manchmal etewas gemein sein, bringst aber auch Humor mit ins Spiel. bleibe immer in der rolle.',
       },
     ],
   };
@@ -104,14 +104,27 @@ async function sendToApi(messageHistory, chatHistoryElement, inputElement) {
   
   
   function addToChatHistoryElement(mhistory) {
-    const htmlStrings = mhistory.messages.map((message) => {
-      return message.role === 'system'
-        ? ''
-        : `<div class="message ${message.role}">${message.content}</div>`;
-    });
-    return htmlStrings.join('');
-  }
+  const htmlStrings = mhistory.messages.map((message) => {
+    // System-Nachrichten nicht anzeigen
+    if (message.role === 'system') return '';
+    
+    let messageContent = '';
+    
+    // Wenn ein Bild vorhanden ist, zeige es an
+    if (message.image) {
+      messageContent += `<img src="${message.image}" alt="Uploaded image">`;
+    }
+    
+    // Füge den Textinhalt hinzu
+    messageContent += message.content;
+    
+    // Erstelle die Nachrichtenblase mit entsprechender Klasse
+    return `<div class="message ${message.role}">${messageContent}</div>`;
+  });
   
+  // Filtere leere Strings heraus (von System-Nachrichten)
+  return htmlStrings.filter(str => str !== '').join('');
+}
   
   
   
