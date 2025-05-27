@@ -58,24 +58,25 @@ formElement.addEventListener('submit', async (event) => {
     messageHistory.messages.push({ role: 'user', content: String(content) });
   }
 
-  // Wenn ein Bild hochgeladen wurde, lese es als Base64 ein
-  if (imageFile && imageFile instanceof File && imageFile.size > 0) {
-    const reader = new FileReader();
-    reader.onload = async function(e) {
-      if (!e.target) {
-        throw new Error("Failed to read image file");
-      }
-      const base64Image = e.target.result;
-      // Füge das Bild als eigene Nachricht hinzu (optional)
-      messageHistory.messages.push({ role: 'user', content: '[Bild hochgeladen]', image: base64Image });
+// Wenn ein Bild hochgeladen wurde, lese es als Base64 ein
+if (imageFile && imageFile instanceof File && imageFile.size > 0) {
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    if (!e.target) {
+      console.error('FileReader event target is null');
+      return;
+    }
+    const base64Image = e.target.result;
+    // Füge das Bild als eigene Nachricht hinzu - mit leerem content statt Text
+    messageHistory.messages.push({ role: 'user', content: '', image: base64Image });
 
-      // Sende die Daten an das Backend
-      await sendToApi(messageHistory, chatHistoryElement, inputElement);
-    };
-    reader.readAsDataURL(imageFile);
-  } else {
+    // Sende die Daten an das Backend
     await sendToApi(messageHistory, chatHistoryElement, inputElement);
-  }
+  };
+  reader.readAsDataURL(imageFile);
+} else {
+  await sendToApi(messageHistory, chatHistoryElement, inputElement);
+}
 });
 
 async function sendToApi(messageHistory, chatHistoryElement, inputElement) {
