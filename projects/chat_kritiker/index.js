@@ -11,7 +11,7 @@
 // What happens if the context gets to long?
 // What happens if the chat-history window get s to full (scolling)
 
-const messageHistory = {
+const kritikerMessageHistory = {
     // messages: [{role: user | assistant | system; content: string}]
     messages: [
       {
@@ -22,7 +22,7 @@ const messageHistory = {
     ],
   };
   
-  const apiEndpoint = 'https://andrea04--47db9506e4d44688987ee108caebbb08.web.val.run';
+  const apiEndpoint = 'https://andrea04--76ab64835a6f42c5b92ee0898a1c84c1.web.val.run';
   
   document.addEventListener('DOMContentLoaded', () => {
     // get the history element
@@ -55,7 +55,7 @@ formElement.addEventListener('submit', async (event) => {
 
   // Nachricht in den Chatverlauf einfügen
   if (content) {
-    messageHistory.messages.push({ role: 'user', content: String(content) });
+    kritikerMessageHistory.messages.push({ role: 'user', content: String(content) });
   }
 
 // Wenn ein Bild hochgeladen wurde, lese es als Base64 ein
@@ -68,14 +68,14 @@ if (imageFile && imageFile instanceof File && imageFile.size > 0) {
     }
     const base64Image = e.target.result;
     // Füge das Bild als eigene Nachricht hinzu - mit leerem content statt Text
-    messageHistory.messages.push({ role: 'user', content: '', image: base64Image });
+    kritikerMessageHistory.messages.push({ role: 'user', content: '', image: base64Image });
 
     // Sende die Daten an das Backend
-    await sendToApi(messageHistory, chatHistoryElement, inputElement);
+    await sendToApi(kritikerMessageHistory, chatHistoryElement, inputElement);
   };
   reader.readAsDataURL(imageFile);
 } else {
-  await sendToApi(messageHistory, chatHistoryElement, inputElement);
+  await sendToApi(kritikerMessageHistory, chatHistoryElement, inputElement);
 }
 });
 
