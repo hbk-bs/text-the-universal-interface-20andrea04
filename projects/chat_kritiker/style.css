@@ -70,4 +70,10 @@ input[type="file"] {
   max-width: 200px;
 }
 
+/* Einheitliche Schriftart für Nachrichten und Buttons */
+.message, button, input {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  /* Dies ist die typische "Clean" Systemschrift, die auch in modernen UIs verwendet wird */
+}
+
 
