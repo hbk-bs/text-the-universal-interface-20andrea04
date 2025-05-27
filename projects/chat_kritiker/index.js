@@ -22,7 +22,7 @@ const kritikerMessageHistory = {
     ],
   };
   
-  const apiEndpoint = 'https://andrea04--76ab64835a6f42c5b92ee0898a1c84c1.web.val.run';
+  const kritikerApiEndpoint = 'https://andrea04--76ab64835a6f42c5b92ee0898a1c84c1.web.val.run';
   
   document.addEventListener('DOMContentLoaded', () => {
     // get the history element
@@ -70,8 +70,28 @@ if (imageFile && imageFile instanceof File && imageFile.size > 0) {
     // Füge das Bild als eigene Nachricht hinzu - mit leerem content statt Text
     kritikerMessageHistory.messages.push({ role: 'user', content: '', image: base64Image });
 
+     // Temporäres Nachrichtenobjekt mit Bild erstellen (wird nicht im History-Array gespeichert)
+      const tempMessageHistory = {
+        messages: [
+          // System-Nachricht kopieren
+          kritikerMessageHistory.messages[0],
+          // Bild-Nachricht hinzufügen
+          { role: 'user', content: '', image: base64Image }
+        ]
+      };
+      
+    
     // Sende die Daten an das Backend
-    await sendToApi(kritikerMessageHistory, chatHistoryElement, inputElement);
+    await sendToApi(tempMessageHistory, chatHistoryElement, inputElement);
+    
+    // Kopiere die letzte Antwort (vom Kunstkritiker) in die eigentliche History
+    if (tempMessageHistory.messages.length > 2) {
+      kritikerMessageHistory.messages.push(tempMessageHistory.messages[tempMessageHistory.messages.length - 1]);
+    }
+    
+    // File-Input zurücksetzen
+    const fileInput = formElement.querySelector('input[type="file"]');
+    if (fileInput && fileInput instanceof HTMLInputElement) fileInput.value = '';
   };
   reader.readAsDataURL(imageFile);
 } else {
@@ -83,7 +103,7 @@ async function sendToApi(messageHistory, chatHistoryElement, inputElement) {
   chatHistoryElement.innerHTML = addToChatHistoryElement(messageHistory);
   inputElement.value = '';
 
-  const response = await fetch(apiEndpoint, {
+  const response = await fetch(kritikerApiEndpoint, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
