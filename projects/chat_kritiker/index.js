@@ -49,19 +49,22 @@ formElement.addEventListener('submit', async (event) => {
   const content = formData.get('content');
   const imageFile = formData.get('image');
 
-  if (!content && (!imageFile || imageFile.size === 0)) {
+  if (!content && (!imageFile || !(imageFile instanceof File) || imageFile.size === 0)) {
     throw new Error("Bitte Text eingeben oder ein Bild auswählen.");
   }
 
   // Nachricht in den Chatverlauf einfügen
   if (content) {
-    messageHistory.messages.push({ role: 'user', content: content });
+    messageHistory.messages.push({ role: 'user', content: String(content) });
   }
 
   // Wenn ein Bild hochgeladen wurde, lese es als Base64 ein
-  if (imageFile && imageFile.size > 0) {
+  if (imageFile && imageFile instanceof File && imageFile.size > 0) {
     const reader = new FileReader();
     reader.onload = async function(e) {
+      if (!e.target) {
+        throw new Error("Failed to read image file");
+      }
       const base64Image = e.target.result;
       // Füge das Bild als eigene Nachricht hinzu (optional)
       messageHistory.messages.push({ role: 'user', content: '[Bild hochgeladen]', image: base64Image });
