@@ -92,6 +92,7 @@ if (imageFile && imageFile instanceof File && imageFile.size > 0) {
     // File-Input zurücksetzen
     const fileInput = formElement.querySelector('input[type="file"]');
     if (fileInput && fileInput instanceof HTMLInputElement) fileInput.value = '';
+
   };
   reader.readAsDataURL(imageFile);
 } else {
@@ -124,14 +125,17 @@ async function sendToApi(messageHistory, chatHistoryElement, inputElement) {
   
   });
   
-  
-  
-  
   function addToChatHistoryElement(mhistory) {
-  const htmlStrings = mhistory.messages.map((message) => {
-    // System-Nachrichten nicht anzeigen
-    if (message.role === 'system') return '';
-    
+  // Filtere System-Nachrichten heraus und prüfe, ob es Nachrichten gibt
+  const filteredMessages = mhistory.messages.filter(message => message.role !== 'system');
+  
+  // Wenn keine Nachrichten außer System-Nachrichten vorhanden sind, zeige den Hinweis
+  if (filteredMessages.length === 0) {
+    return '<div class="empty-chat-message">Schreib mir eine Nachricht</div>';
+  }
+  
+  // Sonst baue die Nachrichten wie gewohnt auf
+  const htmlStrings = filteredMessages.map((message) => {
     let messageContent = '';
     
     // Wenn ein Bild vorhanden ist, zeige es an
@@ -146,9 +150,11 @@ async function sendToApi(messageHistory, chatHistoryElement, inputElement) {
     return `<div class="message ${message.role}">${messageContent}</div>`;
   });
   
-  // Filtere leere Strings heraus (von System-Nachrichten)
-  return htmlStrings.filter(str => str !== '').join('');
+  return htmlStrings.join('');
 }
+  
+  
+
   
   
   

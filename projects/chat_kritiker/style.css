@@ -109,3 +109,27 @@ input[type="file"] {
   }
 }
 
+/* Styling für den leeren Chat-Hinweis */
+.empty-chat-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  font-size: 1.5rem;
+  color: #aaa;
+  text-align: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  pointer-events: none; /* damit Clicks durchgehen */
+}
+
+/* Stelle sicher, dass der Chat-Container relativ positioniert ist */
+.chat-history {
+  position: relative;
+  min-height: 300px;
+}
+
