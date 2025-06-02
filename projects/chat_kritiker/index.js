@@ -1,157 +1,205 @@
-//@ts-check
-// [x]. get the content from the input element
-// [x]. send the content to the val town endpoint using fetch POST request
-// [x]. await the response
-// [x]. get the json from the response
-// [x]. Add the user message to the .chat-history
+// @ts-check
+const apiEndpoint = 'https://andrea04--76ab64835a6f42c5b92ee0898a1c84c1.web.val.run';
 
-// How to control the behaviour of the chat bot?
+document.addEventListener('DOMContentLoaded', () => {
+	const form = document.querySelector('form');
+	if (!form) return;
 
-// Bonus:
-// What happens if the context gets to long?
-// What happens if the chat-history window get s to full (scolling)
+	/**
+	 * On submit of the form
+	 * we do:
+	 * - show loading dots
+	 * - convert the file to a data URL
+	 * - send the data URL to the API
+	 * - parse the response
+	 * - show the result
+	 */
+	form.addEventListener('submit', async (e) => {
+		e.preventDefault();
 
-const kritikerMessageHistory = {
-    // messages: [{role: user | assistant | system; content: string}]
-    messages: [
-      {
-        role: 'system',
-        content:
-          'du bist ein strenger kunstkritiker der an allen Kunstwerken etwas zu bemängeln hat. du glaubst deine Meinung ist die einzige richtige und analysierst Bilder auf einem sehr hohen Niveau mit vielen Fachbegriffen. Du kannst in deiner Bewertung manchmal etewas gemein sein, bringst aber auch Humor mit ins Spiel. bleibe immer in der rolle.',
-      },
-    ],
-  };
-  
-  const kritikerApiEndpoint = 'https://andrea04--76ab64835a6f42c5b92ee0898a1c84c1.web.val.run';
-  
-  document.addEventListener('DOMContentLoaded', () => {
-    // get the history element
-    const chatHistoryElement = document.querySelector('.chat-history');
-    const inputElement = document.querySelector('input');
-    const formElement = document.querySelector('form');
-    // check if the elements exists in the DOM
-    if (!chatHistoryElement) {
-      throw new Error('Could not find element .chat-history');
-    }
-    if (!formElement) {
-      throw new Error('Form element does not exists');
-    }
-    if (!inputElement) {
-      throw new Error('Could not find input element');
-    }
-    // run a function when the user hits send
-    
-    // ...existing code...
-formElement.addEventListener('submit', async (event) => {
-  event.preventDefault();
+		// loading indicator so the user knows something is happening
+		const dots = ['', '.', '..', '...'];
+		let index = 0;
+		const interval = setInterval(() => {
+			const resultContainer = document.getElementById('result');
+			if (!resultContainer) return;
+			resultContainer.innerHTML = `<p>Loading${dots[index]}</p>`;
+			index++;
+			if (index === dots.length) index = 0;
+		}, 100);
 
-  const formData = new FormData(formElement);
-  const content = formData.get('content');
-  const imageFile = formData.get('image');
+		// get the file from the form
+		const formData = new FormData(form);
+		const file = formData.get('image');
 
-  if (!content && (!imageFile || !(imageFile instanceof File) || imageFile.size === 0)) {
-    throw new Error("Bitte Text eingeben oder ein Bild auswählen.");
-  }
+		// if the file is not a File object, show an error
+		if (!(file instanceof File)) {
+			clearInterval(interval);
+			const resultContainer = document.getElementById('result');
+			if (resultContainer)
+				resultContainer.innerHTML = '<p>Error: No file selected.</p>';
+			return;
+		}
 
-  // Nachricht in den Chatverlauf einfügen
-  if (content) {
-    kritikerMessageHistory.messages.push({ role: 'user', content: String(content) });
-  }
+		// if the file is not an image, show an error
+		if (!file.type.startsWith('image/')) {
+			clearInterval(interval);
+			const resultContainer = document.getElementById('result');
+			if (resultContainer)
+				resultContainer.innerHTML =
+					'<p>Error: Only image files are allowed.</p>';
+			return;
+		}
 
-// Wenn ein Bild hochgeladen wurde, lese es als Base64 ein
-if (imageFile && imageFile instanceof File && imageFile.size > 0) {
-  const reader = new FileReader();
-  reader.onload = async function(e) {
-    if (!e.target) {
-      console.error('FileReader event target is null');
-      return;
-    }
-    const base64Image = e.target.result;
-    // Füge das Bild als eigene Nachricht hinzu - mit leerem content statt Text
-    kritikerMessageHistory.messages.push({ role: 'user', content: '', image: base64Image });
+		// exclude SVG images
+		if (file.type === 'image/svg+xml') {
+			clearInterval(interval);
+			const resultContainer = document.getElementById('result');
+			if (resultContainer)
+				resultContainer.innerHTML = '<p>Error: SVG images are not allowed.</p>';
+			return;
+		}
 
-     // Temporäres Nachrichtenobjekt mit Bild erstellen (wird nicht im History-Array gespeichert)
-      const tempMessageHistory = {
-        messages: [
-          // System-Nachricht kopieren
-          kritikerMessageHistory.messages[0],
-          // Bild-Nachricht hinzufügen
-          { role: 'user', content: '', image: base64Image }
-        ]
-      };
-      
-    
-    // Sende die Daten an das Backend
-    await sendToApi(tempMessageHistory, chatHistoryElement, inputElement);
-    
-    // Kopiere die letzte Antwort (vom Kunstkritiker) in die eigentliche History
-    if (tempMessageHistory.messages.length > 2) {
-      kritikerMessageHistory.messages.push(tempMessageHistory.messages[tempMessageHistory.messages.length - 1]);
-    }
-    
-    // File-Input zurücksetzen
-    const fileInput = formElement.querySelector('input[type="file"]');
-    if (fileInput && fileInput instanceof HTMLInputElement) fileInput.value = '';
+		// convert the file to a data URL
+		/**
+		 * A data URL is a type of Uniform Resource Identifier (URI) that allows small files to be embedded directly within HTML, CSS, or JavaScript code as a string of text. This scheme enables the inclusion of data in-line in web pages, as if they were external resources. Data URLs are commonly used to embed images, CSS, and even JavaScript code within a document. They are particularly useful for small files, as they can reduce the number of HTTP requests needed to load a web page. However, it is important to minimize the number of data URLs used on a page and ensure proper MIME type declaration. Additionally, testing across different browsers and avoiding the embedding of sensitive data are recommended practices.
+		 * - https://developer.mozilla.org/en-US/docs/Web/URI/Reference/Schemes/data
+		 * -https://flaviocopes.com/data-urls/
+		 */
+		const dataURL = await fileToDataURL(file);
 
-  };
-  reader.readAsDataURL(imageFile);
-} else {
-  await sendToApi(kritikerMessageHistory, chatHistoryElement, inputElement);
-}
+		// check image dimensions
+		await checkImageSize(dataURL, interval);
+
+		// show the image
+		const imageContainer = document.getElementById('image-container');
+		if (!imageContainer) return;
+		imageContainer.innerHTML = `<img src="${dataURL}" alt="uploaded image" />`;
+
+		// This is the data we send to our openAI API
+
+		const data = {
+			response_format: { type: 'json_object' },
+			messages: [
+				{
+					role: 'system',
+					content: `You are a highly renounced but very smug art critic that gives hard reviews.
+			Respond ONLY in a JSON object with values conforming to: {rating: number, reason: string}
+			`,
+				},
+				{
+					role: 'user',
+					// THIS IS IMPORTANT
+					// the content is not a string anymore
+					// we send a specific object that contains the image data url
+					content: [
+						{
+							type: 'image_url',
+							image_url: {
+								url: dataURL,
+							},
+						},
+					],
+				},
+			],
+			max_tokens: 200,
+		};
+
+		// send the data to the API
+		const response = await fetch(apiEndpoint, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(data),
+		});
+		if (!response.ok) {
+			// if the response is not ok, show an error
+			const resultContainer = document.getElementById('result');
+			if (!resultContainer) return;
+			resultContainer.innerHTML = `<p>Error: ${response.statusText}</p>`;
+			clearInterval(interval);
+			return;
+		}
+
+		// parse the response
+		const result = await response.json();
+
+		// clear the loading indicator
+		clearInterval(interval);
+
+		// show the result
+		const resultContainer = document.getElementById('result');
+		if (!resultContainer) return;
+		const parsedResult = JSON.parse(
+			result.completion.choices[0].message.content,
+		);
+		resultContainer.innerHTML = `<p>Rating: ${parsedResult.rating}</p><p>Reason: ${parsedResult.reason}</p>`;
+	});
 });
 
-async function sendToApi(messageHistory, chatHistoryElement, inputElement) {
-  chatHistoryElement.innerHTML = addToChatHistoryElement(messageHistory);
-  inputElement.value = '';
-
-  const response = await fetch(kritikerApiEndpoint, {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-    },
-    body: JSON.stringify(messageHistory),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(errorText);
-  }
-
-  const json = await response.json();
-  messageHistory.messages.push(json.completion.choices[0].message);
-  chatHistoryElement.innerHTML = addToChatHistoryElement(messageHistory);
+/**
+ * Checks the size of an image.
+ * @param {string} dataURL - The data URL of the image.
+ * @param {number} interval - The interval to clear.
+ * @returns {Promise<void>}
+ */
+async function checkImageSize(dataURL, interval) {
+	const img = new Image();
+	img.src = dataURL;
+	await new Promise((resolve, reject) => {
+		img.onload = () => {
+			if (img.width > 500 || img.height > 500) {
+				clearInterval(interval);
+				const resultContainer = document.getElementById('result');
+				if (resultContainer)
+					resultContainer.innerHTML =
+						'<p>Error: Image must be 500x500px or smaller.</p>';
+				return reject(new Error('Image too large'));
+			}
+			resolve(true);
+		};
+		img.onerror = () => reject(new Error('Image failed to load'));
+	});
 }
-    
-  
-  });
-  
-  function addToChatHistoryElement(mhistory) {
-  // Filtere System-Nachrichten heraus und prüfe, ob es Nachrichten gibt
-  const filteredMessages = mhistory.messages.filter(message => message.role !== 'system');
-  
-  // Wenn keine Nachrichten außer System-Nachrichten vorhanden sind, zeige den Hinweis
-  if (filteredMessages.length === 0) {
-    return '<div class="empty-chat-message">Schreib mir eine Nachricht</div>';
-  }
-  
-  // Sonst baue die Nachrichten wie gewohnt auf
-  const htmlStrings = filteredMessages.map((message) => {
-    let messageContent = '';
-    
-    // Wenn ein Bild vorhanden ist, zeige es an
-    if (message.image) {
-      messageContent += `<img src="${message.image}" alt="Uploaded image">`;
-    }
-    
-    // Füge den Textinhalt hinzu
-    messageContent += message.content;
-    
-    // Erstelle die Nachrichtenblase mit entsprechender Klasse
-    return `<div class="message ${message.role}">${messageContent}</div>`;
-  });
-  
-  return htmlStrings.join('');
+
+/**
+ * Converts a File object to a base64-encoded Data URL string.
+ * @param {File} file - The file to convert.
+ * @returns {Promise<string>} A promise that resolves to a Data URL (e.g., "data:image/png;base64,...").
+ */
+async function fileToDataURL(file) {
+	const base64String = await fileToBase64(file);
+
+	// Determine the MIME type
+	const mimeType = file.type || 'application/octet-stream';
+
+	// Create the Base64 encoded Data URL
+	return `data:${mimeType};base64,${base64String}`;
 }
+
+/**
+ * Converts a File object to a base64-encoded string.
+ * @param {File} file - The file to convert.
+ * @returns {Promise<string>} A promise that resolves to a base64-encoded string.
+ */
+async function fileToBase64(file) {
+	// Read the file as an ArrayBuffer
+	const arrayBuffer = await file.arrayBuffer();
+
+	// Convert ArrayBuffer to a typed array (Uint8Array)
+	const uintArray = new Uint8Array(arrayBuffer);
+
+	// Convert typed array to binary string
+	const binaryString = uintArray.reduce(
+		(acc, byte) => acc + String.fromCharCode(byte),
+		'',
+	);
+
+	// Encode binary string to base64
+	return btoa(binaryString);
+}
+
   
   
 

@@ -3,26 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>chat</title>
-
+    <title>Chat Kritiker</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <main>
-        <div class="chat-container"></div>
-        <div class="chat-history"></div>
-         </div>
-  <form>
-    <input type="text" name="content" placeholder="Nachricht eingeben...">
-    <input type="file" name="image" accept="image/*">
-    <button type="submit">Senden</button>
-  </form>
-</div>
+        <div class="chat-container">
+            <div class="chat-history"></div>
+            <div id="result"></div>
+            <div id="image-container"></div>
+            <form>
+                <input type="text" name="content" placeholder="Nachricht eingeben...">
+                <input type="file" name="image" accept="image/*">
+                <button type="submit">Senden</button>
+            </form>
+        </div>
     </main>
     <div class="canvas-container">
-                <div id="sketch"></div>
-                <a href="index.js" class="source-link">source code</a>
-            </div>
+        <div id="sketch"></div>
+        <a href="index.js" class="source-link">source code</a>
+    </div>
     <script src="index.js"></script>
 </body>
 </html>
