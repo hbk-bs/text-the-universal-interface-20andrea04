@@ -29,7 +29,7 @@ const messageHistory = {
     // get the history element
     const chatHistoryElement = document.querySelector('.chat-history');
     const formElement = document.querySelector('form');
-    const textInputElement = document.querySelector('input');
+    const textInputElement = document.querySelector('input[name="content"]');
     const fileInputElement = document.querySelector('input[name="image"]');
     
     // check if the elements exists in the DOM
@@ -53,13 +53,16 @@ const messageHistory = {
       return;
     }
 
-    // Lade-Animation starten
+       // Lade-Animation direkt im Chat starten
+    const loadingMessageId = 'loading-message-' + Date.now();
+    addMessageToChat('assistant', `<span id="${loadingMessageId}">Lade</span>`);
+    
     const dots = ['', '.', '..', '...'];
     let index = 0;
     const interval = setInterval(() => {
-      const resultContainer = document.getElementById('result');
-      if (resultContainer) {
-        resultContainer.innerHTML = `<p>Lade${dots[index]}</p>`;
+      const loadingElement = document.getElementById(loadingMessageId);
+      if (loadingElement) {
+        loadingElement.innerHTML = `Lade${dots[index]}`;
       }
       index = (index + 1) % dots.length;
     }, 300);
@@ -73,8 +76,11 @@ const messageHistory = {
         // Benutzernachricht im Chat anzeigen
         addMessageToChat('user', userMessage);
         
-        // Eingabefeld leeren
-        textInputElement.value = '';
+                // Eingabefeld leeren
+        if (textInputElement && 'value' in textInputElement) {
+          textInputElement.value = '';
+        }
+
       }
 
       // Falls ein Bild vorhanden ist
@@ -98,12 +104,7 @@ const messageHistory = {
         
         // Zeige das Bild im Chat an
         addImageToChat('user', dataURL);
-        
-        // Zeige das Bild im Container an
-        const imageContainer = document.getElementById('image-container');
-        if (imageContainer) {
-          imageContainer.innerHTML = `<img src="${dataURL}" alt="Hochgeladenes Bild" />`;
-        }
+    
       }
 
       let response;
@@ -163,11 +164,6 @@ const messageHistory = {
           // Assistenten-Antwort zum Chat hinzufügen
           addMessageToChat('assistant', parsedResult.response || parsedResult.reason);
           
-          // Ergebnis anzeigen
-          const resultContainer = document.getElementById('result');
-          if (resultContainer) {
-            resultContainer.innerHTML = `<p>Bewertung: ${parsedResult.rating}/10</p><p>${parsedResult.response || parsedResult.reason}</p>`;
-          }
           
           // Antwort zum Nachrichtenverlauf hinzufügen
           messageHistory.messages.push({ 
@@ -212,9 +208,23 @@ const messageHistory = {
       if (resultContainer) {
         resultContainer.innerHTML = `<p>Fehler: ${error.message}</p>`;
       }
-    } finally {
+    } 
+
+    finally {
       // Lade-Animation beenden
       clearInterval(interval);
+      
+      // Entferne Lade-Nachricht wenn sie noch existiert
+      const loadingElement = document.getElementById(loadingMessageId);
+      if (loadingElement) {
+        loadingElement.remove();
+      }
+
+      // Datei-Input zurücksetzen, mit Prüfung ob value existiert
+      if (fileInputElement && 'value' in fileInputElement) {
+        fileInputElement.value = '';
+      }
+
     }
   });
 
