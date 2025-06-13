@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Zurück zum Upload-Bereich
-    newUploadButton.addEventListener('click', () => {
+    newUploadButton.addEventListener('click', async () => {
         // Vorhang schließen
         document.body.classList.remove('curtain-open');
         
@@ -45,10 +45,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const spotlight = document.querySelector('.spotlight');
         if (spotlight) spotlight.remove();
         
-        galleryArea.classList.add('hidden');
-        uploadArea.classList.remove('hidden');
+       
         // Bubble verstecken
         critiqueBubble.classList.add('hidden');
+
+        // WICHTIG: Warten, bis der Vorhang vollständig geschlossen ist
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        galleryArea.classList.add('hidden');
+        uploadArea.classList.remove('hidden');
+
         // Formular zurücksetzen
         uploadForm.reset();
         fileName.textContent = "Keine Datei ausgewählt";
@@ -114,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
             
             // Zeige das Bild im Container an
-            imageContainer.innerHTML = `<img src="${dataURL}" alt="Hochgeladenes Kunstwerk" />`;
+            //imageContainer.innerHTML = `<img src="${dataURL}" alt="Hochgeladenes Kunstwerk" />`;
             
             // Weitere Verzögerung für die Kritik
             await new Promise(resolve => setTimeout(resolve, 1000));
