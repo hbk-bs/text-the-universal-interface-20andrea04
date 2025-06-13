@@ -1,24 +1,39 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kunstkritiker chat</title>
-
+    <title>Der unbarmherzige Kunstkritiker</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <main>
-        <h1>Kunst-Kritiker Chat</h1>
-        <div class="chat-history"></div>
-        <div id="result"></div>
+    <!-- Upload-Bereich (anfangs sichtbar) -->
+    <div id="upload-area">
+        <div class="upload-container">
+            <h1>Der unbarmherzige Kunstkritiker</h1>
+            <p>Laden Sie ein Bild hoch und erhalten Sie eine schonungslose Kritik.</p>
+            <form id="upload-form">
+                <label for="image-upload" class="upload-button">Bild auswählen</label>
+                <input type="file" id="image-upload" name="image" accept="image/*" hidden>
+                <span id="file-name">Keine Datei ausgewählt</span>
+                <button type="submit" id="submit-button" disabled>Kritik erhalten</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Galerie-Bereich (nach Upload sichtbar) -->
+    <div id="gallery-area" class="hidden">
         <div id="image-container"></div>
-        <form>
-            <input type="text" name="content" placeholder="Nachricht eingeben...">
-            <input type="file" name="image" accept="image/*">
-            <button type="submit">Senden</button>
-        </form>
-    </main>
+        <div id="critique-bubble" class="hidden">
+            <div class="bubble-content">
+                <div class="rating"></div>
+                <p class="critique-text"></p>
+            </div>
+            <div class="bubble-tail"></div>
+        </div>
+        <button id="new-upload-button" class="action-button">Neues Bild hochladen</button>
+    </div>
+
     <script src="index.js"></script>
 </body>
 </html>
