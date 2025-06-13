@@ -81,9 +81,24 @@ document.addEventListener('DOMContentLoaded', () => {
             // Von Upload zu Galerie wechseln
             uploadArea.classList.add('hidden');
             galleryArea.classList.remove('hidden');
+
+             // Bild SOFORT laden, aber anfangs unsichtbar halten
+             imageContainer.innerHTML = `<img src="${dataURL}" alt="Hochgeladenes Kunstwerk" style="opacity: 0; transition: opacity 1s ease;" />`;
             
+            // Kurze Pause, damit das Bild geladen werden kann
+             await new Promise(resolve => setTimeout(resolve, 100));
+             
             // Vorhang öffnen
             document.body.classList.add('curtain-open');
+
+            // Zeit für die Vorhang-Animation abwarten (entspricht der Transitions-Zeit in CSS)
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+              // Bild einblenden, sobald der Vorhang geöffnet ist
+              const img = imageContainer.querySelector('img');
+              if (img) {
+              img.style.opacity = '1';
+           }
             
             // Spotlight-Element erstellen und anzeigen
             const spotlight = document.createElement('div');
@@ -96,8 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Spotlight einblenden
             spotlight.classList.add('spotlight-visible');
             
-            // Verzögerung, bevor das Bild angezeigt wird
-            await new Promise(resolve => setTimeout(resolve, 1500));
+    
             
             // Zeige das Bild im Container an
             imageContainer.innerHTML = `<img src="${dataURL}" alt="Hochgeladenes Kunstwerk" />`;
