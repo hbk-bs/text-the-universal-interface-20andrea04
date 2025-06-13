@@ -5,12 +5,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // DOM-Elemente
     const uploadArea = document.getElementById('upload-area');
     const galleryArea = document.getElementById('gallery-area');
-    /** @type {HTMLFormElement} */
     const uploadForm = /** @type {HTMLFormElement} */ (document.getElementById('upload-form'));
-    /** @type {HTMLInputElement} */
     const fileInput = /** @type {HTMLInputElement} */ (document.getElementById('image-upload'));
     const fileName = document.getElementById('file-name');
-    /** @type {HTMLButtonElement} */
     const submitButton = /** @type {HTMLButtonElement} */ (document.getElementById('submit-button'));
     const imageContainer = document.getElementById('image-container');
     const critiqueBubble = document.getElementById('critique-bubble');
@@ -25,6 +22,9 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
+    // Stelle sicher, dass der Vorhang anfangs geschlossen ist
+    document.body.classList.remove('curtain-open');
+
     // Datei-Auswahl-Anzeige
     fileInput.addEventListener('change', () => {
         if (fileInput.files && fileInput.files[0]) {
@@ -38,6 +38,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Zurück zum Upload-Bereich
     newUploadButton.addEventListener('click', () => {
+        // Vorhang schließen
+        document.body.classList.remove('curtain-open');
+        
+        // Entferne Spotlight
+        const spotlight = document.querySelector('.spotlight');
+        if (spotlight) spotlight.remove();
+        
         galleryArea.classList.add('hidden');
         uploadArea.classList.remove('hidden');
         // Bubble verstecken
@@ -63,12 +70,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            // Prüfe, ob es sich um ein Bild handelt (lockerer Filter)
+            // Prüfe, ob es sich um ein Bild handelt
             if (!file.type.startsWith('image/')) {
                 throw new Error('Bitte laden Sie eine Bilddatei hoch.');
             }
-            
-            // SVG-Bilder jetzt erlaubt - Einschränkung entfernt
             
             // Konvertiere Datei zu Data URL
             const dataURL = await fileToDataURL(file);
@@ -77,8 +82,28 @@ document.addEventListener('DOMContentLoaded', () => {
             uploadArea.classList.add('hidden');
             galleryArea.classList.remove('hidden');
             
+            // Vorhang öffnen
+            document.body.classList.add('curtain-open');
+            
+            // Spotlight-Element erstellen und anzeigen
+            const spotlight = document.createElement('div');
+            spotlight.className = 'spotlight';
+            galleryArea.appendChild(spotlight);
+            
+            // Verzögerung für dramatischen Effekt
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            // Spotlight einblenden
+            spotlight.classList.add('spotlight-visible');
+            
+            // Verzögerung, bevor das Bild angezeigt wird
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
             // Zeige das Bild im Container an
             imageContainer.innerHTML = `<img src="${dataURL}" alt="Hochgeladenes Kunstwerk" />`;
+            
+            // Weitere Verzögerung für die Kritik
+            await new Promise(resolve => setTimeout(resolve, 1000));
             
             // Lade-Animation in der Sprechblase
             critiqueBubble.classList.remove('hidden');
