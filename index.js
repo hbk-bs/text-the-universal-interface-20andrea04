@@ -155,6 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         - Dein Ton soll herablassend, arrogant und überheblich sein
                         - Erwähne mindestens ein oder zwei spezifische technische oder konzeptionelle "Fehler"
                         - Schließe gelegentlich mit einem herablassenden "Ratschlag" ab
+                        - Sei prägnant und knapp - MAXIMAL 100 WÖRTER!
                         
                         Antworte NUR im JSON-Format mit Werten gemäß: {rating: number, response: string}
                         Die Bewertung (rating) sollte zwischen 1 und 10 liegen, meist im unteren Bereich (1-5).
