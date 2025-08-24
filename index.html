@@ -11,46 +11,34 @@
     	<div id="backlink">
 		<style>
 			#backlink {
-				--color-accent: hsl(198, 100%, 50%);
-				position: absolute;
-				top: 8px;
-				right: 8px;
-				border: 1px dashed black;
-				background-color: white;
-				padding: 8px;
-				cursor: pointer;
-				color: black;
-				font-size: 0.8rem;
-				font-weight: bold;
-				transition: all 0.3s ease;
-				transform: rotate(-2deg) scale(0.9);
-				box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
-                z-index: 20;
-				a {
-					text-decoration: none;
-					color: black;
-					color: inherit;
-					text-decoration: underline;
-					background-image: linear-gradient(to right,
-							var(--color-accent) 0%,
-							var(--color-accent) 100%);
-					background-size: 0% 100%;
-					background-position: left center;
-					background-repeat: no-repeat;
-					transition: background-size 0.2s ease-in-out;
-					padding: 0.5rem;
-				}
-				a:hover {
-					background-size: 100% 100%;
-					color: white;
-				}
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+			z-index: 9999;
+        }
 
-			}
-			#backlink:hover {
-				transform: rotate(2deg) scale(1);
-			}
+        #backlink a {
+            display: inline-flex;
+            align-items: center;
+            color: #4e89ae; /* Direkte Farbe statt Variable */
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 8px; /* Direkt statt Variable */
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Direkt statt Variable */
+            transition: all 0.3s ease;
+        }
+
+        #backlink a:hover {
+            transform: translateX(-3px);
+            color: #43658b; /* Direkte Farbe statt Variable */
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+			
 		</style>
-		<a href="https://rundgang2025.qawsed.site">Back to the Rundgang 2025</a>
+		<a href="http://127.0.0.1:3000/documentation-2025-20andrea04/llm/">back to text the universal interface</a>
 	</div>
     
     <!-- Vorhang (immer sichtbar) -->
