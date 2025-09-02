@@ -233,6 +233,36 @@ p {
     border-top: 20px solid white;
 }
 
+@media (max-width: 600px) {
+    #critique-bubble {
+        padding: 12px;
+        border-radius: 10px;
+        max-width: 95vw;
+        max-height: 80vh;
+        font-size: 1rem;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
+    .bubble-tail {
+        bottom: -12px;
+        border-left: 12px solid transparent;
+        border-right: 12px solid transparent;
+        border-top: 12px solid white;
+    }
+    .critique-text {
+        font-size: 1rem;
+    }
+    .rating {
+        font-size: 1.1rem;
+    }
+    .action-button {
+        padding: 8px 16px;
+        font-size: 1rem;
+        bottom: 16px;
+    }
+}
+
 .action-button {
     position: absolute;
     bottom: 30px;
